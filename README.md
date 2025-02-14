@@ -18,6 +18,10 @@ bootstrap();
    - 컨트롤러, 서비스 등을 모듈로 등록.
 
 ```
+nest g mo
+```
+
+```
 import { Module } from '@nestjs/common';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
@@ -37,7 +41,11 @@ export class AppModule {}
 ## 3. Controller
    - 클라이언트의 요청을 받아서 처리하는 역할.
    - @Controller() 데코레이터를 사용하여 정의.
-   - @Get(), @Post(), @Put(), @Delete() 등의 데코레이터를 사용하여 라우트를 설정.
+   - @Get(), @Post(), @Put(), @Delete(), @Patch(), @Options(), @Head(), @All() 등
+
+```
+nest g co
+```
 
 ```
 import { Controller, Get } from '@nestjs/common';
@@ -55,6 +63,10 @@ export class UserController {
    - 비즈니스 로직을 처리하는 역할.
    - @Injectable() 데코레이터를 사용하여 의존성 주입 가능.
    - 컨트롤러에서 호출하여 데이터를 가공하거나 데이터베이스와 상호작용.
+
+```
+nest g s
+```
 
 ```
 import { Injectable } from '@nestjs/common';
@@ -83,5 +95,93 @@ export class UserService {
   getUser() {
     return '유저 정보';
   }
+}
+```
+
+---
+
+## PUT vx PATCH ?
+PUT → 리소스를 완전히 대체해야 할 때 사용.
+PATCH → 특정 필드만 부분 수정할 때 사용.
+
+```
+import { Controller, Put, Patch, Param, Body } from '@nestjs/common';
+
+@Controller('users')
+export class UserController {
+  // PUT: 전체 업데이트
+  @Put(':id')
+  updateUser(@Param('id') id: string, @Body() updateUserDto: any) {
+    return `유저 ${id}의 정보를 전체 업데이트: ${JSON.stringify(updateUserDto)}`;
+  }
+
+  // PATCH: 부분 업데이트
+  @Patch(':id')
+  partialUpdateUser(@Param('id') id: string, @Body() updateUserDto: any) {
+    return `유저 ${id}의 일부 정보를 업데이트: ${JSON.stringify(updateUserDto)}`;
+  }
+}
+```
+
+---
+
+## DTO (Data Transfer Object) ?
+
+DTO가 필요한 이유
+   1. 데이터 유효성 검사 : 잘못된 데이터를 방지 (예: 이메일 형식이 올바르지 않거나 필수 값이 빠진 경우).
+   2. 타입 안정성 보장 : TypeScript의 타입을 활용해 오류를 줄임.
+   3. 보안 강화 : 요청 객체를 직접 사용하지 않고 DTO를 거쳐서 데이터 조작을 방지.
+   4. 코드 가독성 & 유지보수성 향상 : 요청 데이터를 구조화하여 가독성이 좋아짐.
+
+### class-validator 예시
+```
+// user.dto.ts
+
+import { IsString, IsEmail, IsInt, Min } from 'class-validator';
+
+export class CreateUserDto {
+  @IsString()
+  name: string;
+
+  @IsEmail()
+  email: string;
+
+  @IsInt()
+  @Min(18) // 최소 18세 이상
+  age: number;
+}
+```
+```
+// user.controller.ts
+
+import { Controller, Post, Body } from '@nestjs/common';
+import { CreateUserDto } from './user.dto';
+
+@Controller('users')
+export class UserController {
+  @Post()
+  createUser(@Body() createUserDto: CreateUserDto) {
+    return `유저 생성됨: ${JSON.stringify(createUserDto)}`;
+  }
+}
+```
+
+### class-transformer
+
+```
+import { IsString, IsEmail, IsInt, Min } from 'class-validator';
+import { Transform } from 'class-transformer';
+
+export class CreateUserDto {
+  @IsString()
+  name: string;
+
+  @IsEmail()
+  email: string;
+
+  @IsInt()
+  @Min(18)
+  @Transform(({ value }) => Number(value)) // 문자열을 숫자로 변환
+  age: number;
 }
 ```
