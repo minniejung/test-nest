@@ -185,3 +185,23 @@ export class CreateUserDto {
   age: number;
 }
 ```
+
+### class-validator Decolator
+```
+@IsString()
+@IsInt()
+@IsBoolean()
+@IsEmail()
+@IsArray()
+@IsEnum()
+@IsNumber()
+@IsDate()
+@IsBase64()
+@IsOptional()
+@MaxLength()
+@MinLength()
+@Length()
+@Matches(RegExp('^[가-힣a-zA-Z0-9]*$'), {message : "unmatch message"})
+@Min()
+@Max()
+```
