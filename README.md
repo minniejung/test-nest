@@ -5,10 +5,18 @@
 ```
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  await app.listen(3000);
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
+  await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
 ```
@@ -23,12 +31,13 @@ nest g mo
 
 ```
 import { Module } from '@nestjs/common';
-import { UserController } from './user.controller';
-import { UserService } from './user.service';
+import { MoviesModule } from './movies/movies.module';
+import { AppController } from './app.controller';
 
 @Module({
-  controllers: [UserController],
-  providers: [UserService],
+  imports: [MoviesModule],
+  controllers: [AppController],
+  providers: [],
 })
 export class AppModule {}
 ```
@@ -37,6 +46,18 @@ export class AppModule {}
    - NestJS 애플리케이션을 구성하는 기본 단위.
    - 관련된 컨트롤러, 서비스, 기타 기능을 하나의 모듈로 묶음.
    - @Module() 데코레이터를 사용하여 정의.
+
+```
+import { Module } from '@nestjs/common';
+import { MoviesController } from './movies.controller';
+import { MoviesService } from './movies.service';
+
+@Module({})
+export class MoviesModule {
+  controllers: [MoviesController];
+  providers: [MoviesService];
+}
+```
 
 ## 3. Controller
    - 클라이언트의 요청을 받아서 처리하는 역할.
@@ -50,11 +71,11 @@ nest g co
 ```
 import { Controller, Get } from '@nestjs/common';
 
-@Controller('users') // /users 경로로 들어오는 요청 처리
-export class UserController {
+@Controller('')
+export class AppController {
   @Get()
-  getUsers() {
-    return '유저 목록';
+  home() {
+    return 'Welcome to my movie API';
   }
 }
 ```
@@ -166,24 +187,12 @@ export class UserController {
 }
 ```
 
-### class-transformer
-
+### dto extension example
 ```
-import { IsString, IsEmail, IsInt, Min } from 'class-validator';
-import { Transform } from 'class-transformer';
+import { PartialType } from '@nestjs/mapped-types';
+import { CreateMovieDto } from './create-movie.dto';
 
-export class CreateUserDto {
-  @IsString()
-  name: string;
-
-  @IsEmail()
-  email: string;
-
-  @IsInt()
-  @Min(18)
-  @Transform(({ value }) => Number(value)) // 문자열을 숫자로 변환
-  age: number;
-}
+export class UpdateMovieDto extends PartialType(CreateMovieDto) {}
 ```
 
 ### class-validator Decolator
@@ -205,3 +214,24 @@ export class CreateUserDto {
 @Min()
 @Max()
 ```
+
+### class-transformer
+
+```
+import { IsString, IsEmail, IsInt, Min } from 'class-validator';
+import { Transform } from 'class-transformer';
+
+export class CreateUserDto {
+  @IsString()
+  name: string;
+
+  @IsEmail()
+  email: string;
+
+  @IsInt()
+  @Min(18)
+  @Transform(({ value }) => Number(value)) // 문자열을 숫자로 변환
+  age: number;
+}
+```
+
