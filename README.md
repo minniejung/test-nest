@@ -79,6 +79,17 @@ export class AppController {
   }
 }
 ```
+```
+@Controller('movies')
+export class MoviesController {
+  constructor(private readonly moviesService: MoviesService) {}
+
+  @Get()
+  getAll(): Movie[] {
+    return this.moviesService.getAll();
+  }
+}
+```
 
 ## 4. Service
    - 비즈니스 로직을 처리하는 역할.
@@ -93,9 +104,11 @@ nest g s
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class UserService {
-  getUsers() {
-    return ['유저1', '유저2', '유저3'];
+export class MoviesService {
+  private movies: Movie[] = [];
+
+  getAll(): Movie[] {
+    return this.movies;
   }
 }
 ```
