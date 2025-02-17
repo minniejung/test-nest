@@ -250,3 +250,33 @@ export class CreateUserDto {
 }
 ```
 
+---
+
+# TIL 17/02/2025 
+
+## Unit testing
+```
+npm run test:watch
+a
+```
+   - You can divide the testing section by using "describe"
+   - You can preset the data by using beforeEach, beforeAll, afterAll
+
+```
+npm run test:cov  
+```
+   - To check how much % I am currently testing
+
+## e2e testing
+
+   - It's important to have same Pipe setting as real environment
+   - e.g.
+```
+     app.useGlobalPipes(
+      new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+      }),
+    );
+    ```
