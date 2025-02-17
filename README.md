@@ -261,6 +261,23 @@ a
 ```
    - You can divide the testing section by using "describe"
    - You can preset the data by using beforeEach, beforeAll, afterAll
+```
+ describe('update()', () => {
+    it('should update a movie', () => {
+      service.update(1, { title: 'Updated test' });
+      const movie = service.getOne(1);
+      expect(movie.title).toEqual('Updated test');
+    });
+
+    it('should throw a NotFoundException (404)', () => {
+      try {
+        service.update(999, {});
+      } catch (error) {
+        expect(error).toBeInstanceOf(NotFoundException);
+      }
+    });
+  });
+```
 
 ```
 npm run test:cov  
@@ -279,4 +296,19 @@ npm run test:cov
         transform: true,
       }),
     );
-    ```
+```
+
+   - e.g.
+```
+    it('POST 400', () => {
+      return request(app.getHttpServer())
+        .post('/movies')
+        .send({
+          title: 'Test title',
+          year: 2001,
+          genres: ['test'],
+          other: 'thing',
+        })
+        .expect(400);
+    });
+```
